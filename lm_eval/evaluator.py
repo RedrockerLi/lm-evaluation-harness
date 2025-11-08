@@ -79,6 +79,7 @@ def simple_evaluate(
     fewshot_random_seed: int = 1234,
     confirm_run_unsafe_code: bool = False,
     metadata: Optional[dict] = None,
+    sparse_method: Optional[str] = None,
 ):
     """Instantiate and evaluate a model on a list of tasks.
 
@@ -233,6 +234,7 @@ def simple_evaluate(
                     "batch_size": batch_size,
                     "max_batch_size": max_batch_size,
                     "device": device,
+                    "sparse_method": sparse_method,
                 },
             )
 
@@ -248,6 +250,7 @@ def simple_evaluate(
                     "batch_size": batch_size,
                     "max_batch_size": max_batch_size,
                     "device": device,
+                    "sparse_method": sparse_method,
                 },
             )
     else:
@@ -257,6 +260,14 @@ def simple_evaluate(
             )
         eval_logger.info("Using pre-initialized model")
         lm = model
+        # If user passed an already-instantiated model, set sparse_method attribute so
+        # downstream inference code can access it.
+        if sparse_method is not None:
+            try:
+                setattr(lm, "sparse_method", sparse_method)
+                eval_logger.info(f"Set sparse_method={sparse_method} on pre-initialized model")
+            except Exception:
+                eval_logger.debug("Failed to set sparse_method on pre-initialized model")
 
     if use_cache is not None:
         eval_logger.info(f"Using cache at {use_cache + '_rank' + str(lm.rank) + '.db'}")

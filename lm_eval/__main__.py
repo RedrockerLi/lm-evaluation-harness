@@ -290,6 +290,12 @@ def setup_parser() -> argparse.ArgumentParser:
         default=None,
         help="""JSON string metadata to pass to task configs, for example '{"max_seq_lengths":[4096,8192]}'. Will be merged with model_args. Can also be set in task config.""",
     )
+    parser.add_argument(
+        "--sparse_method",
+        type=str,
+        default="none",
+        help="Method to use for sparse attention. Options are 'none', 'top-k', 'top-p'.",
+    )
     return parser
 
 
@@ -477,6 +483,7 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
         gen_kwargs=args.gen_kwargs,
         task_manager=task_manager,
         predict_only=args.predict_only,
+        sparse_method=args.sparse_method,
         random_seed=args.seed[0],
         numpy_random_seed=args.seed[1],
         torch_random_seed=args.seed[2],

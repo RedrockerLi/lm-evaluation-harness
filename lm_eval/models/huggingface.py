@@ -106,6 +106,11 @@ class HFLM(TemplateLM):
         **kwargs,
     ) -> None:
         super().__init__()
+        # pull out sparse_method from kwargs early so it doesn't get forwarded
+        # to other initialization calls that don't expect it.
+        self.sparse_method = kwargs.pop("sparse_method", None)
+        if self.sparse_method is not None:
+            eval_logger.info(f"Using sparse_method={self.sparse_method}")
         # optionally: take in an already-initialized transformers.PreTrainedModel
         if not isinstance(pretrained, str):
             eval_logger.warning(
